@@ -26,7 +26,7 @@ const Camera = () => {
           videoRef.current.srcObject = stream;
           videoRef.current.play();
           setIsStreaming(true);
-          const options = { mimeType: "video/webm; codecs=vp9" };
+          const options = { mimeType: "video/mp4" };
 
           const recorder = new MediaRecorder(stream, options);
           setMediaRecorder(recorder);
@@ -63,7 +63,7 @@ const Camera = () => {
       mediaRecorder.start();
       setIsRecording(true);
       mediaRecorder.ondataavailable = (event) => {
-        const blob = new Blob([event.data], { type: "video/webm" });
+        const blob = new Blob([event.data], { type: "video/mp4" });
         const url = URL.createObjectURL(blob);
         setVideoURL(url);
       };
