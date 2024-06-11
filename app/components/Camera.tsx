@@ -10,11 +10,12 @@ const Camera = () => {
     null
   );
   const [videoURL, setVideoURL] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useEffect(() => {
+  const startCamera = () => {
     const constraints = {
-      video: true,
-      audio: true,
+      video: { facingMode: "user" },
+      audio: false,
     };
 
     navigator.mediaDevices
@@ -26,25 +27,20 @@ const Camera = () => {
           setIsStreaming(true);
           const recorder = new MediaRecorder(stream);
           setMediaRecorder(recorder);
+          setErrorMessage(null);
         }
       })
       .catch((err) => {
         console.error("Error accessing camera: ", err);
+        setErrorMessage("Error accessing camera: " + err.message);
       });
-
-    return () => {
-      if (videoRef.current) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        const tracks = stream?.getTracks();
-        tracks?.forEach((track) => track.stop());
-        videoRef.current.srcObject = null;
-      }
-    };
-  }, []);
+  };
   const takePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       if (context) {
+        context.translate(canvasRef.current.width, 0);
+        context.scale(-1, 1);
         context.drawImage(
           videoRef.current,
           0,
@@ -52,6 +48,7 @@ const Camera = () => {
           canvasRef.current.width,
           canvasRef.current.height
         );
+
         const dataUrl = canvasRef.current.toDataURL("image/png");
         console.log("Photo taken: ", dataUrl);
       }
@@ -78,51 +75,74 @@ const Camera = () => {
   };
   return (
     <div>
-      <video ref={videoRef} style={{ width: "640px", height: "480px" }} />
-      <button
-        style={{
-          margin: "6px 12px",
-          padding: "8px 16px",
-          background: "#2ae3f7",
-          color: "#fff",
-          display: "block",
-        }}
-        onClick={takePhoto}
-      >
-        Take Photo
-      </button>
       <div>
+        {!isStreaming && !errorMessage && (
+          <button
+            onClick={startCamera}
+            style={{
+              margin: "6px 12px",
+              padding: "8px 16px",
+              background: "#22eb36",
+              color: "#fff",
+              display: "block",
+            }}
+          >
+            Start Camera
+          </button>
+        )}
         <button
-          onClick={startRecording}
-          disabled={isRecording}
           style={{
             margin: "6px 12px",
             padding: "8px 16px",
-            background: "#7c2af7",
+            background: "#2ae3f7",
             color: "#fff",
             display: "block",
           }}
+          onClick={takePhoto}
         >
-          Start Recording
+          Take Photo
         </button>
-        <button
-          onClick={stopRecording}
-          disabled={!isRecording}
-          style={{
-            margin: "6px 12px",
-            padding: "8px 16px",
-            background: "#f72a5a",
-            color: "#fff",
-            display: "block",
-          }}
-        >
-          Stop Recording
-        </button>
+        {!isRecording ? (
+          <button
+            onClick={startRecording}
+            style={{
+              margin: "6px 12px",
+              padding: "8px 16px",
+              background: "#7c2af7",
+              color: "#fff",
+              display: "block",
+            }}
+          >
+            Start Recording
+          </button>
+        ) : (
+          <button
+            onClick={stopRecording}
+            disabled={!isRecording}
+            style={{
+              margin: "6px 12px",
+              padding: "8px 16px",
+              background: "#f72a5a",
+              color: "#fff",
+              display: "block",
+            }}
+          >
+            Stop Recording
+          </button>
+        )}
       </div>
+      <video
+        ref={videoRef}
+        style={{ width: "640px", height: "480px", transform: "scaleX(-1)" }}
+      />
       {videoURL && (
         <div>
           <h3>Recorded Video:</h3>
-          <video src={videoURL} controls style={{ width: "100%" }} />
+          <video
+            src={videoURL}
+            controls
+            style={{ width: "640px", height: "480px", transform: "scaleX(-1)" }}
+          />
         </div>
       )}
       <canvas
@@ -131,7 +151,6 @@ const Camera = () => {
         width="640"
         height="480"
       />
-
       {!isStreaming && <p>Loading camera...</p>}
     </div>
   );
