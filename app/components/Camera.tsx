@@ -1,9 +1,11 @@
 "use client";
+import useBrowserAndOS from "@/hooks/useBrowserAndOS";
 import { useRef, useState, useEffect } from "react";
 
 const Camera = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [videoType, setVideoType] = useState<string>("");
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
@@ -11,12 +13,20 @@ const Camera = () => {
   );
   const [videoURL, setVideoURL] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
+
+  const { browserName } = useBrowserAndOS();
+  useEffect(() => {
+    if (browserName.toLowerCase() === "safari") {
+      setVideoType("video/mp4");
+    } else {
+      setVideoType("video/webm");
+    }
+  }, []);
 
   const startCamera = () => {
     const constraints = {
       video: { facingMode: "user" },
-      audio: false,
+      audio: true,
     };
 
     navigator.mediaDevices
@@ -26,7 +36,7 @@ const Camera = () => {
           videoRef.current.srcObject = stream;
           videoRef.current.play();
           setIsStreaming(true);
-          const options = { mimeType: "video/mp4" };
+          const options = { mimeType: videoType };
 
           const recorder = new MediaRecorder(stream, options);
           setMediaRecorder(recorder);
@@ -43,7 +53,7 @@ const Camera = () => {
       const context = canvasRef.current.getContext("2d");
       if (context) {
         context.translate(canvasRef.current.width, 0);
-        context.scale(-1, 1);
+        context.scale(0, 0);
         context.drawImage(
           videoRef.current,
           0,
@@ -57,19 +67,17 @@ const Camera = () => {
       }
     }
   };
-
   const startRecording = () => {
     if (mediaRecorder && !isRecording) {
       mediaRecorder.start();
       setIsRecording(true);
       mediaRecorder.ondataavailable = (event) => {
-        const blob = new Blob([event.data], { type: "video/mp4" });
+        const blob = new Blob([event.data], { type: videoType });
         const url = URL.createObjectURL(blob);
         setVideoURL(url);
       };
     }
   };
-
   const stopRecording = () => {
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
@@ -134,17 +142,14 @@ const Camera = () => {
           </button>
         )}
       </div>
-      <video
-        ref={videoRef}
-        style={{ width: "640px", height: "480px", transform: "scaleX(-1)" }}
-      />
+      <video ref={videoRef} style={{ width: "640px", height: "480px" }} />
       {videoURL && (
         <div>
           <h3>Recorded Video:</h3>
           <video
             src={videoURL}
             controls
-            style={{ width: "640px", height: "480px", transform: "scaleX(-1)" }}
+            style={{ width: "640px", height: "480px" }}
           />
         </div>
       )}
