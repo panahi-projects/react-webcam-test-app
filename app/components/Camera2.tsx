@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 
-const Camera = () => {
+const Camera2 = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -11,7 +11,6 @@ const Camera = () => {
   );
   const [videoURL, setVideoURL] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
 
   const startCamera = () => {
     const constraints = {
@@ -26,9 +25,7 @@ const Camera = () => {
           videoRef.current.srcObject = stream;
           videoRef.current.play();
           setIsStreaming(true);
-          const options = { mimeType: "video/webm; codecs=vp9" };
-
-          const recorder = new MediaRecorder(stream, options);
+          const recorder = new MediaRecorder(stream);
           setMediaRecorder(recorder);
           setErrorMessage(null);
         }
@@ -159,4 +156,4 @@ const Camera = () => {
   );
 };
 
-export default Camera;
+export default Camera2;
