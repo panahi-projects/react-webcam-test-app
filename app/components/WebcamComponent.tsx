@@ -5,7 +5,7 @@ import Webcam from "react-webcam";
 const WebcamComponent = () => {
   const [imgSrc, setImgSrc] = useState(null);
   const webcamRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
+  const mediaRecorderRef = useRef<MediaRecorder>(null);
   const [capturing, setCapturing] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
 
@@ -39,7 +39,7 @@ const WebcamComponent = () => {
   );
 
   const handleStopCaptureClick = useCallback(() => {
-    (mediaRecorderRef as any).current.stop();
+    mediaRecorderRef.current?.stop();
     setCapturing(false);
   }, [mediaRecorderRef, webcamRef, setCapturing]);
 
@@ -67,14 +67,6 @@ const WebcamComponent = () => {
   };
   return (
     <>
-      {/* <button onClick={capturePhoto}>Capture photo</button>
-      <Webcam
-        suppressHydrationWarning
-        ref={webcamPhotoRef}
-        mirrored={true}
-        videoConstraints={videoConstraints}
-      />
-      {imgSrc && <img src={imgSrc} />} */}
       <button
         onClick={capturePhoto}
         style={{
