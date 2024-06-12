@@ -48,34 +48,19 @@ const Camera = () => {
         setErrorMessage("Error accessing camera: " + err.message);
       });
   };
-  const takePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext("2d");
-      if (context) {
-        context.translate(canvasRef.current.width, 0);
-        context.scale(0, 0);
-        context.drawImage(
-          videoRef.current,
-          0,
-          0,
-          canvasRef.current.width,
-          canvasRef.current.height
-        );
-
-        const dataUrl = canvasRef.current.toDataURL("image/png");
-        console.log("Photo taken: ", dataUrl);
-      }
-    }
-  };
   const startRecording = () => {
-    if (mediaRecorder && !isRecording) {
-      mediaRecorder.start();
-      setIsRecording(true);
-      mediaRecorder.ondataavailable = (event) => {
-        const blob = new Blob([event.data], { type: videoType });
-        const url = URL.createObjectURL(blob);
-        setVideoURL(url);
-      };
+    try {
+      if (mediaRecorder && !isRecording) {
+        mediaRecorder.start();
+        setIsRecording(true);
+        mediaRecorder.ondataavailable = (event) => {
+          const blob = new Blob([event.data], { type: videoType });
+          const url = URL.createObjectURL(blob);
+          setVideoURL(url);
+        };
+      }
+    } catch (err) {
+      setErrorMessage("Error accessing camera: " + err);
     }
   };
   const stopRecording = () => {
@@ -101,18 +86,6 @@ const Camera = () => {
             Start Camera
           </button>
         )}
-        <button
-          style={{
-            margin: "6px 12px",
-            padding: "8px 16px",
-            background: "#2ae3f7",
-            color: "#fff",
-            display: "block",
-          }}
-          onClick={takePhoto}
-        >
-          Take Photo
-        </button>
         {!isRecording ? (
           <button
             onClick={startRecording}
@@ -142,6 +115,7 @@ const Camera = () => {
           </button>
         )}
       </div>
+      <pre>{errorMessage}</pre>
       <video ref={videoRef} style={{ width: "640px", height: "480px" }} />
       {videoURL && (
         <div>
