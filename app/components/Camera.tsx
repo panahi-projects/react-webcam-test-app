@@ -14,7 +14,7 @@ const Camera = () => {
   const [videoURL, setVideoURL] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { browserName } = useBrowserAndOS();
+  const { browserName, browserVersion, osName, osVersion } = useBrowserAndOS();
   useEffect(() => {
     if (browserName.toLowerCase() === "safari") {
       setVideoType("video/mp4");
@@ -116,6 +116,18 @@ const Camera = () => {
         )}
       </div>
       <pre>{errorMessage}</pre>
+      <div>
+        <span>Browser:</span>
+        <span>
+          {browserName} {browserVersion}
+        </span>
+      </div>
+      <div>
+        <span>OS:</span>
+        <span>
+          {osName} {osVersion}
+        </span>
+      </div>
       <video ref={videoRef} style={{ width: "640px", height: "480px" }} />
       {videoURL && (
         <div>
