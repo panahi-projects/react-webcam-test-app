@@ -15,15 +15,20 @@ const Camera = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { browserName, browserVersion, osName, osVersion } = useBrowserAndOS();
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (browserName.toLowerCase() === "safari") {
+  //     setVideoType("video/mp4");
+  //   } else {
+  //     setVideoType("video/webm");
+  //   }
+  // }, []);
+
+  const startCamera = () => {
     if (browserName.toLowerCase() === "safari") {
       setVideoType("video/mp4");
     } else {
       setVideoType("video/webm");
     }
-  }, []);
-
-  const startCamera = () => {
     const constraints = {
       video: { facingMode: "user" },
       audio: true,
@@ -127,6 +132,10 @@ const Camera = () => {
         <span>
           {osName} {osVersion}
         </span>
+      </div>
+      <div>
+        <span>video type:</span>
+        <span>{videoType}</span>
       </div>
       <video ref={videoRef} style={{ width: "640px", height: "480px" }} />
       {videoURL && (
