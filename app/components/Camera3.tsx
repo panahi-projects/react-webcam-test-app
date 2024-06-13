@@ -15,7 +15,7 @@ const Camera3 = () => {
     (mediaRecorderRef as any).current = new MediaRecorder(
       (webcamRef as any).current.stream,
       {
-        mimeType: "video/webm",
+        mimeType: "video/mp4",
       }
     );
     (mediaRecorderRef as any).current.addEventListener(
