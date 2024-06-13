@@ -1,7 +1,11 @@
-import React, { useRef, useState } from "react";
+import useBrowserAndOS from "@/hooks/useBrowserAndOS";
+import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 const Camera3 = () => {
+  const { browserName, browserVersion, osName, osVersion } = useBrowserAndOS();
+  const saveButton = useRef(null);
+
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const [capturing, setCapturing] = useState(false);
@@ -15,7 +19,8 @@ const Camera3 = () => {
     (mediaRecorderRef as any).current = new MediaRecorder(
       (webcamRef as any).current.stream,
       {
-        mimeType: "video/mp4",
+        mimeType:
+          browserName.toLowerCase() === "safari" ? "video/mp4" : "video/webm",
       }
     );
     (mediaRecorderRef as any).current.addEventListener(
@@ -35,6 +40,9 @@ const Camera3 = () => {
     try {
       (mediaRecorderRef as any).current.stop();
       setCapturing(false);
+      setTimeout(() => {
+        (saveButton.current as any).click();
+      }, 2000);
     } catch (err) {
       setError("Error: " + err);
     }
@@ -43,7 +51,8 @@ const Camera3 = () => {
   const handleSaveVideo = () => {
     if (recordedChunks.length) {
       const blob = new Blob(recordedChunks, {
-        type: "video/mp4",
+        type:
+          browserName.toLowerCase() === "safari" ? "video/mp4" : "video/webm",
       });
       const url = URL.createObjectURL(blob);
       setVideoUrl(url as any);
@@ -60,9 +69,14 @@ const Camera3 = () => {
       ) : (
         <button onClick={handleStartCaptureClick}>Start Capture</button>
       )}
-      {recordedChunks.length > 0 && (
-        <button onClick={handleSaveVideo}>Save Video</button>
-      )}
+
+      <button
+        onClick={handleSaveVideo}
+        ref={saveButton}
+        style={{ display: "none" }}
+      >
+        Save Video
+      </button>
       {videoUrl && (
         <div>
           <h3>Recorded Video:</h3>
