@@ -7,6 +7,7 @@ const Camera3 = () => {
   const [capturing, setCapturing] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [error, setError] = useState("");
 
   const handleStartCaptureClick = () => {
     setCapturing(true);
@@ -31,8 +32,12 @@ const Camera3 = () => {
   };
 
   const handleStopCaptureClick = () => {
-    (mediaRecorderRef as any).current.stop();
-    setCapturing(false);
+    try {
+      (mediaRecorderRef as any).current.stop();
+      setCapturing(false);
+    } catch (err) {
+      setError("Error: " + err);
+    }
   };
 
   const handleSaveVideo = () => {
@@ -49,6 +54,7 @@ const Camera3 = () => {
   return (
     <div>
       <Webcam audio={true} ref={webcamRef} />
+      <pre>{error}</pre>
       {capturing ? (
         <button onClick={handleStopCaptureClick}>Stop Capture</button>
       ) : (
