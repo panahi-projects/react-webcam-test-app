@@ -43,7 +43,7 @@ const Camera3 = () => {
   const handleSaveVideo = () => {
     if (recordedChunks.length) {
       const blob = new Blob(recordedChunks, {
-        type: "video/webm",
+        type: "video/mp4",
       });
       const url = URL.createObjectURL(blob);
       setVideoUrl(url as any);
