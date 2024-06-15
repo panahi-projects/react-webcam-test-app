@@ -1,5 +1,5 @@
 import useBrowserAndOS from "@/hooks/useBrowserAndOS";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 const Camera3 = () => {
@@ -42,7 +42,7 @@ const Camera3 = () => {
       setCapturing(false);
       setTimeout(() => {
         (saveButton.current as any).click();
-      }, 2000);
+      }, 1000);
     } catch (err) {
       setError("Error: " + err);
     }
@@ -80,7 +80,7 @@ const Camera3 = () => {
       {videoUrl && (
         <div>
           <h3>Recorded Video:</h3>
-          <video src={videoUrl} controls autoPlay loop />
+          <video src={videoUrl} controls muted />
         </div>
       )}
     </div>
